@@ -1,2 +1,45 @@
 Loaded module: cuda/12.0
 Global seed set to 42
+../../detecting_causes_of_gender_bias_chest_xrays/dataloader/dataloader.py:381: FutureWarning: The default value of numeric_only in DataFrameGroupBy.mean is deprecated. In a future version, numeric_only will default to False. Either specify numeric_only or select only columns which should be valid for the function.
+  df_per_patient = df.groupby(['Patient ID', 'Patient Gender']).mean()
+../../detecting_causes_of_gender_bias_chest_xrays/dataloader/dataloader.py:410: FutureWarning: The default value of numeric_only in DataFrameGroupBy.mean is deprecated. In a future version, numeric_only will default to False. Either specify numeric_only or select only columns which should be valid for the function.
+  df_per_patient = df.groupby([self.col_name_patient_id, self.col_name_gender]).mean()
+Loading Data:   0%|          | 0/8460 [00:00<?, ?it/s]Loading Data:  10%|▉         | 830/8460 [00:00<00:00, 8298.52it/s]Loading Data:  20%|█▉        | 1670/8460 [00:00<00:00, 8353.81it/s]Loading Data:  30%|██▉       | 2506/8460 [00:00<00:00, 8331.73it/s]Loading Data:  40%|███▉      | 3360/8460 [00:00<00:00, 8413.24it/s]Loading Data:  50%|████▉     | 4204/8460 [00:00<00:00, 8422.42it/s]Loading Data:  60%|█████▉    | 5048/8460 [00:00<00:00, 8425.95it/s]Loading Data:  70%|██████▉   | 5891/8460 [00:00<00:00, 8418.33it/s]Loading Data:  80%|███████▉  | 6733/8460 [00:00<00:00, 8415.57it/s]Loading Data:  90%|████████▉ | 7587/8460 [00:00<00:00, 8453.79it/s]Loading Data: 100%|█████████▉| 8441/8460 [00:01<00:00, 8477.56it/s]Loading Data: 100%|██████████| 8460/8460 [00:01<00:00, 8423.86it/s]
+Loading Data:   0%|          | 0/1409 [00:00<?, ?it/s]Loading Data:  60%|██████    | 851/1409 [00:00<00:00, 8505.00it/s]Loading Data: 100%|██████████| 1409/1409 [00:00<00:00, 8479.58it/s]
+Loading Data:   0%|          | 0/8459 [00:00<?, ?it/s]Loading Data:  10%|▉         | 837/8459 [00:00<00:00, 8369.29it/s]Loading Data:  20%|█▉        | 1674/8459 [00:00<00:00, 8222.77it/s]Loading Data:  30%|██▉       | 2499/8459 [00:00<00:00, 8232.02it/s]Loading Data:  40%|███▉      | 3344/8459 [00:00<00:00, 8317.13it/s]Loading Data:  50%|████▉     | 4198/8459 [00:00<00:00, 8395.89it/s]Loading Data:  60%|█████▉    | 5038/8459 [00:00<00:00, 8385.09it/s]Loading Data:  69%|██████▉   | 5877/8459 [00:00<00:00, 8382.75it/s]Loading Data:  79%|███████▉  | 6718/8459 [00:00<00:00, 8388.33it/s]Loading Data:  89%|████████▉ | 7557/8459 [00:00<00:00, 8384.58it/s]Loading Data:  99%|█████████▉| 8396/8459 [00:01<00:00, 8321.36it/s]Loading Data: 100%|██████████| 8459/8459 [00:01<00:00, 8340.59it/s]
+/zhome/0f/f/154252/chexpert_env/lib/python3.8/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/zhome/0f/f/154252/chexpert_env/lib/python3.8/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=ResNet50_Weights.IMAGENET1K_V1`. You can also use `weights=ResNet50_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+Lossy conversion from float32 to uint8. Range [0, 1]. Convert image to uint8 prior to saving to suppress this warning.
+Lossy conversion from float32 to uint8. Range [0, 1]. Convert image to uint8 prior to saving to suppress this warning.
+Lossy conversion from float32 to uint8. Range [0, 1]. Convert image to uint8 prior to saving to suppress this warning.
+Lossy conversion from float32 to uint8. Range [0, 1]. Convert image to uint8 prior to saving to suppress this warning.
+Lossy conversion from float32 to uint8. Range [0, 1]. Convert image to uint8 prior to saving to suppress this warning.
+/zhome/0f/f/154252/chexpert_env/lib/python3.8/site-packages/pytorch_lightning/trainer/connectors/accelerator_connector.py:474: LightningDeprecationWarning: Setting `Trainer(gpus=1)` is deprecated in v1.7 and will be removed in v2.0. Please use `Trainer(accelerator='gpu', devices=1)` instead.
+  rank_zero_deprecation(
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name       | Type               | Params
+--------------------------------------------------
+0 | model      | ResNet             | 23.5 M
+1 | loss_func  | BCELoss            | 0     
+2 | accu_func  | MultilabelAccuracy | 0     
+3 | auroc_func | MultilabelAUROC    | 0     
+--------------------------------------------------
+23.5 M    Trainable params
+0         Non-trainable params
+23.5 M    Total params
+94.147    Total estimated model params size (MB)
+/zhome/0f/f/154252/chexpert_env/lib/python3.8/site-packages/pytorch_lightning/trainer/connectors/data_connector.py:224: PossibleUserWarning: The dataloader, val_dataloader 0, does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` (try 32 which is the number of cpus on this machine) in the `DataLoader` init to improve performance.
+  rank_zero_warn(
+/zhome/0f/f/154252/chexpert_env/lib/python3.8/site-packages/torchmetrics/utilities/prints.py:36: UserWarning: No positive samples in targets, true positive value should be meaningless. Returning zero tensor in true positive score
+  warnings.warn(*args, **kwargs)
+/zhome/0f/f/154252/chexpert_env/lib/python3.8/site-packages/pytorch_lightning/trainer/connectors/data_connector.py:224: PossibleUserWarning: The dataloader, train_dataloader, does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` (try 32 which is the number of cpus on this machine) in the `DataLoader` init to improve performance.
+  rank_zero_warn(
+`Trainer.fit` stopped: `max_epochs=20` reached.
+Test-loop:   0%|          | 0/23 [00:00<?, ?it/s]Test-loop:   4%|▍         | 1/23 [00:00<00:11,  1.98it/s]Test-loop:  13%|█▎        | 3/23 [00:00<00:03,  5.02it/s]Test-loop:  22%|██▏       | 5/23 [00:00<00:02,  6.82it/s]Test-loop:  30%|███       | 7/23 [00:01<00:01,  8.18it/s]Test-loop:  39%|███▉      | 9/23 [00:01<00:01,  8.85it/s]Test-loop:  48%|████▊     | 11/23 [00:01<00:01,  9.27it/s]Test-loop:  57%|█████▋    | 13/23 [00:01<00:01,  9.77it/s]Test-loop:  65%|██████▌   | 15/23 [00:01<00:00, 10.06it/s]Test-loop:  74%|███████▍  | 17/23 [00:02<00:00, 10.11it/s]Test-loop:  83%|████████▎ | 19/23 [00:02<00:00, 10.07it/s]Test-loop:  91%|█████████▏| 21/23 [00:02<00:00, 10.19it/s]Test-loop: 100%|██████████| 23/23 [00:02<00:00, 11.62it/s]

@@ -100,8 +100,6 @@ def embeddings(model, data_loader, device):
 
 def main(args,female_perc_in_training=None,random_state=None,chose_disease_str=None):
 
-
-
     # sets seeds for numpy, torch, python.random and PYTHONHASHSEED.
     pl.seed_everything(42, workers=True)
 
@@ -151,6 +149,27 @@ def main(args,female_perc_in_training=None,random_state=None,chose_disease_str=N
 
             )
     elif args.dataset == 'chexpert':
+        if args.crop != None:
+            raise Exception('Crop experiment not implemented for chexpert.')
+        data = CheXpertDataResampleModule(img_data_dir=args.img_data_dir,
+                                        csv_file_img=args.csv_file_img,
+                                        image_size=args.image_size,
+                                        pseudo_rgb=False,
+                                        batch_size=args.bs,
+                                        num_workers=args.num_workers,
+                                        augmentation=args.augmentation,
+                                        outdir=out_dir,
+                                        version_no=cur_version,
+                                        female_perc_in_training=female_perc_in_training,
+                                        chose_disease=chose_disease_str,
+                                        random_state=random_state,
+                                        num_classes=args.num_classes,
+                                        num_per_patient=args.npp,
+                                        prevalence_setting = args.prevalence_setting
+
+                )
+
+    else:
         raise Exception('not implemented')
 
     # model
