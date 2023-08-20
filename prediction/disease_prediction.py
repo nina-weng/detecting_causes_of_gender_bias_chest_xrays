@@ -114,8 +114,8 @@ def main(args,female_perc_in_training=None,random_state=None,chose_disease_str=N
     run_config+= f'-fp{female_perc_in_training}-npp{args.npp}-rs{random_state}' #f_per, npp and rs
 
     # if the hp value is not default
-    for each_hp in hp_default_value.keys:
-        if hp_default_value[each_hp] != args.each_hp:
+    for each_hp in hp_default_value.keys():
+        if hp_default_value[each_hp] != args[each_hp]:
             run_config+= f'-{each_hp}{args.each_hp}'
 
     print('------------------------------------------\n'*3)
@@ -308,9 +308,11 @@ if __name__ == '__main__':
             raise Exception('Something wrong with args.random_states : {}'.format(args.random_states))
     rs_min, rs_max = int(args.random_state.split('-')[0]),int(args.random_state.split('-')[1])
 
+    female_percent_in_training_set = [int(each) for each in args.female_percent_in_training]
+    print(female_percent_in_training_set)
 
-    print('***********RESAMPLING EXPERIMENT**********\n'*5)
+    print('***********RESAMPLING EXPERIMENT**********\n')
     for d in args.disease_label:
-        for female_perc_in_training in args.female_percent_in_training:
-            for i in np.range(rs_min, rs_max):
+        for female_perc_in_training in female_percent_in_training_set:
+            for i in np.arange(rs_min, rs_max):
                 main(args, female_perc_in_training=female_perc_in_training,random_state = i,chose_disease_str=d)
