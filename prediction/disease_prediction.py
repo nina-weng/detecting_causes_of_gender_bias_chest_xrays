@@ -301,8 +301,8 @@ if __name__ == '__main__':
 
     print(args)
 
-    if len(int(args.random_state.split('-'))) != 2:
-        if len(int(args.random_state.split('-'))) == 1:
+    if len(args.random_state.split('-')) != 2:
+        if len(args.random_state.split('-')) == 1:
             rs_min, rs_max = int(args.random_state), int(args.random_state)+1
         else:
             raise Exception('Something wrong with args.random_states : {}'.format(args.random_states))
