@@ -308,10 +308,10 @@ if __name__ == '__main__':
             raise Exception('Something wrong with args.random_states : {}'.format(args.random_states))
     rs_min, rs_max = int(args.random_state.split('-')[0]),int(args.random_state.split('-')[1])
 
-    female_percent_in_training_set = [int(each.join('')) for each in args.female_percent_in_training]
+    female_percent_in_training_set = [int(''.join(each)) for each in args.female_percent_in_training]
     print(female_percent_in_training_set)
 
-    disease_label_list = [int(each.join('')) for each in args.disease_label]
+    disease_label_list = [int(''.join(each)) for each in args.disease_label]
     print(disease_label_list)
 
 
