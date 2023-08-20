@@ -311,7 +311,7 @@ if __name__ == '__main__':
     female_percent_in_training_set = [int(''.join(each)) for each in args.female_percent_in_training]
     print(female_percent_in_training_set)
 
-    disease_label_list = [int(''.join(each)) for each in args.disease_label]
+    disease_label_list = [''.join(each) for each in args.disease_label]
     print(disease_label_list)
 
 
