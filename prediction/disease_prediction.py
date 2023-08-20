@@ -308,11 +308,15 @@ if __name__ == '__main__':
             raise Exception('Something wrong with args.random_states : {}'.format(args.random_states))
     rs_min, rs_max = int(args.random_state.split('-')[0]),int(args.random_state.split('-')[1])
 
-    female_percent_in_training_set = [int(each) for each in args.female_percent_in_training]
+    female_percent_in_training_set = [int(each.join('')) for each in args.female_percent_in_training]
     print(female_percent_in_training_set)
 
+    disease_label_list = [int(each.join('')) for each in args.disease_label]
+    print(disease_label_list)
+
+
     print('***********RESAMPLING EXPERIMENT**********\n')
-    for d in args.disease_label:
+    for d in disease_label_list:
         for female_perc_in_training in female_percent_in_training_set:
             for i in np.arange(rs_min, rs_max):
                 main(args, female_perc_in_training=female_perc_in_training,random_state = i,chose_disease_str=d)
