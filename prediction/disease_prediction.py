@@ -1,7 +1,7 @@
 import sys
 sys.path.append('../../detecting_causes_of_gender_bias_chest_xrays')
 
-from dataloader.dataloader import DISEASE_LABELS_NIH,NIHDataResampleModule
+from dataloader.dataloader import DISEASE_LABELS_NIH,NIHDataResampleModule, DISEASE_LABELS_CHE
 from prediction.models import ResNet,DenseNet
 
 
@@ -19,58 +19,23 @@ from argparse import ArgumentParser
 import shutil
 import numpy as np
 
-# test
 
-num_classes = len(DISEASE_LABELS)
-image_size = (1024, 1024)
-image_size = (224, 224)
+hp_default_value={'model':'resnet',
+                  'model_scale':50,
+                  'lr':1e-6,
+                  'bs':64,
+                  'epochs':20,
+                  'pretrained':True,
+                  'augmentation':True,
+                  'is_multilabel':False,
+                  'image_size':(224,224),
+                  'crop':None,
+                  'prevalence_setting':'separate',
+                  'save_model':False,
+                  'num_workers':2
 
-# parameters that could change
-if image_size[0] == 224:
-    batch_size = 64
-elif image_size[0] == 1024:
-    batch_size = 16
-else:
-    raise Exception('wrong image size')
+}
 
-epochs = 20
-num_workers = 2 ###
-model_choose = 'resnet' # or 'densenet'
-model_scale = '50'
-lr=1e-6
-pretrained = True
-augmentation = True
-
-gi_split=True
-# gender_setting='100%_female'  # '0%_female', '100%_female'
-fold_nums=np.arange(0,20)
-
-resam=True
-female_perc_in_training_set = [0,50,100]#
-random_state_set = np.arange(0,10)
-num_per_patient = 1
-disease_list=['Cardiomegaly']
-# chose_disease_str =  'Effusion' #'Pneumonia','Pneumothorax','Cardiomegaly'
-random_state = 2022
-if resam: num_classes = 1
-# print('multi label training')
-# num_classes = len(DISEASE_LABELS)
-isMultilabel = True if num_classes!=1 else False
-crop = None # None or [0,1]
-prevalence_setting = 'total' #['separate','total','equal']
-
-save_model_para = False
-loss_func_type='BCE'
-
-
-if image_size[0] == 224:
-    img_data_dir = '/work3/ninwe/dataset/NIH/preproc_224x224/'
-elif image_size[0] == 1024:
-    img_data_dir = '/work3/ninwe/dataset/NIH/images/'
-
-
-csv_file_img = '../datafiles/'+'Data_Entry_2017_v2020_clean_split.csv'
-#csv_file_img = 'D:/ninavv/phd/data/NIH/'+'Data_Entry_2017_v2020_clean_split_fake.csv'
 
 
 def get_cur_version(dir_path):
@@ -84,7 +49,7 @@ def freeze_model(model):
     for param in model.parameters():
         param.requires_grad = False
 
-def test_func(model, data_loader, device):
+def test_func(args,model, data_loader, device):
     model.eval()
     logits = []
     preds = []
@@ -104,7 +69,7 @@ def test_func(model, data_loader, device):
         targets = torch.cat(targets, dim=0)
 
         counts = []
-        for i in range(0,num_classes):
+        for i in range(0,args.num_classes):
             t = targets[:, i] == 1
             c = torch.sum(t)
             counts.append(c)
@@ -133,7 +98,7 @@ def embeddings(model, data_loader, device):
 
 
 
-def main(hparams,gender_setting=None,fold_num=None,female_perc_in_training=None,random_state=None,chose_disease_str=None):
+def main(args,female_perc_in_training=None,random_state=None,chose_disease_str=None):
 
 
 
@@ -141,133 +106,57 @@ def main(hparams,gender_setting=None,fold_num=None,female_perc_in_training=None,
     pl.seed_everything(42, workers=True)
 
     use_cuda = torch.cuda.is_available()
-    device = torch.device("cuda:" + str(hparams.dev) if use_cuda else "cpu")
+    device = torch.device("cuda:" + str(args.dev) if use_cuda else "cpu")
     print('DEVICE:{}'.format(device))
 
     # get run_config
-    if not gi_split:
-        view_position = 'AP'  # 'AP','PA','all'
-        vp_sample = False
-        if vp_sample and view_position != 'all':
-            raise Exception('Could not sample the train set anymore for VP=AP/PA!')
-        only_gender = None  # 'F' , 'M', None
+    run_config = f'{args.dataset}-{chose_disease_str}' # dataset and the predicted label
+    run_config+= f'-fp{female_perc_in_training}-npp{args.npp}-rs{random_state}' #f_per, npp and rs
 
-        run_config = '{}{}-lr{}-ep{}-pt{}-aug{}-VP{}-sam{}-SEX{}-imgs{}-mpara{}'.format(model_choose, model_scale, lr, epochs,
-                                                                                int(pretrained),
-                                                                                int(augmentation), str(view_position),
-                                                                                int(vp_sample),
-                                                                                str(only_gender),
-                                                                                image_size[0],
-                                                                                int(save_model_para))
-    else:
-        view_position = 'all'  # 'AP','PA','all'
-        vp_sample = False
-        only_gender = None  # 'F' , 'M', None
-        gender_setting = '{}%_female'.format(female_perc_in_training)
-        run_config = '{}{}-lr{}-ep{}-pt{}-aug{}-VP{}-GIsplit-{}-Fold{}-imgs{}-mpara{}'.format(model_choose, model_scale, lr,
-                                                                                   epochs,
-                                                                                   int(pretrained),
-                                                                                   int(augmentation), view_position,
-                                                                                   gender_setting,
-                                                                                   fold_num,
-                                                                                   image_size[0],
-                                                                                   int(save_model_para))
-
-    if resam:
-        if loss_func_type == 'BCE':
-            run_config = '{}{}-lr{}-ep{}-pt{}-aug{}-{}%female-D{}-npp{}-ml{}-rs{}-imgs{}-crop{}-ps{}-mpara{}'.format(model_choose, model_scale, lr,
-                                                                                      epochs,
-                                                                                      int(pretrained),
-                                                                                      int(augmentation),
-                                                                                      female_perc_in_training,
-                                                                                      chose_disease_str,
-                                                                                      num_per_patient,
-                                                                                      int(isMultilabel),
-                                                                                      random_state,
-                                                                                      image_size[0],
-                                                                                      crop,
-                                                                                      prevalence_setting,
-                                                                                      int(save_model_para))
-        else:
-            run_config = '{}{}-lr{}-ep{}-pt{}-aug{}-{}%female-D{}-npp{}-ml{}-rs{}-loss{}-imgs{}-crop{}-ps{}-mpara{}'.format(model_choose, model_scale, lr,
-                                                                                      epochs,
-                                                                                      int(pretrained),
-                                                                                      int(augmentation),
-                                                                                      female_perc_in_training,
-                                                                                      chose_disease_str,
-                                                                                      num_per_patient,
-                                                                                      int(isMultilabel),
-                                                                                      random_state,
-                                                                                      loss_func_type,
-                                                                                      image_size[0],
-                                                                                      crop,
-                                                                                      prevalence_setting,
-                                                                                      int(save_model_para))
+    # if the hp value is not default
+    for each_hp in hp_default_value.keys:
+        if hp_default_value[each_hp] != args.each_hp:
+            run_config+= f'-{each_hp}{args.each_hp}'
 
     print('------------------------------------------\n'*3)
     print(run_config)
+
     # Create output directory
     # out_name = str(model.model_name)
-    run_dir = '/work3/ninwe/run/NIH/disease/'
+    run_dir = '/work3/ninwe/run/cause_bias/'
     out_dir = run_dir + run_config
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 
     cur_version = get_cur_version(out_dir)
 
-
-
-
-    # data
-    if resam != True:
-        data = NIHDataModule(img_data_dir=img_data_dir,
-                                csv_file_img=csv_file_img,
-                                image_size=image_size,
+    if args.dataset == 'NIH':
+        data = NIHDataResampleModule(img_data_dir=args.img_data_dir,
+                                csv_file_img=args.csv_file_img,
+                                image_size=args.image_size,
                                 pseudo_rgb=False,
-                                batch_size=batch_size,
-                                num_workers=num_workers,
-                                augmentation=augmentation,
-                                view_position = view_position,
-                                vp_sample = vp_sample,
-                                only_gender=only_gender,
-                             save_split=True,
-                             outdir=out_dir,
-                             version_no=cur_version,
-                             gi_split=gi_split,
-                             gender_setting=gender_setting,
-                             fold_num=fold_num)
-    else:
-        data = NIHDataResampleModule(img_data_dir=img_data_dir,
-                                csv_file_img=csv_file_img,
-                                image_size=image_size,
-                                pseudo_rgb=False,
-                                batch_size=batch_size,
-                                num_workers=num_workers,
-                                augmentation=augmentation,
+                                batch_size=args.bs,
+                                num_workers=args.num_workers,
+                                augmentation=args.augmentation,
                                 outdir=out_dir,
                                 version_no=cur_version,
                                 female_perc_in_training=female_perc_in_training,
                                 chose_disease=chose_disease_str,
                                 random_state=random_state,
-                                num_classes=num_classes,
-                                num_per_patient=num_per_patient,
-                                crop=crop,
-                                prevalence_setting = prevalence_setting,
+                                num_classes=args.num_classes,
+                                num_per_patient=args.npp,
+                                crop=args.crop,
+                                prevalence_setting = args.prevalence_setting,
 
             )
 
-    if data.df_train is None:
-        # end this run
-        return
-
-
     # model
-    if model_choose == 'resnet':
+    if args.model_choose == 'resnet':
         model_type = ResNet
-    elif model_choose == 'densenet':
+    elif args.model_choose == 'densenet':
         model_type = DenseNet
-    model = model_type(num_classes=num_classes,lr=lr,pretrained=pretrained,model_scale=model_scale,
-                       loss_func_type = loss_func_type)
+    model = model_type(num_classes=args.num_classes,lr=args.lr,pretrained=args.pretrained,model_scale=args.model_scale,
+                       loss_func_type = 'BCE')
 
 
     temp_dir = os.path.join(out_dir, 'temp_version_{}'.format(cur_version))
@@ -275,7 +164,7 @@ def main(hparams,gender_setting=None,fold_num=None,female_perc_in_training=None,
         os.makedirs(temp_dir)
 
     for idx in range(0,5):
-        if augmentation:
+        if args.augmentation:
             sample = data.train_set.exam_augmentation(idx)
             sample = np.asarray(sample)
             sample = np.transpose(sample, (2, 1, 0))
@@ -285,7 +174,7 @@ def main(hparams,gender_setting=None,fold_num=None,female_perc_in_training=None,
             sample = np.asarray(sample['image'])
             imsave(os.path.join(temp_dir, 'sample_' + str(idx) + '.png'), sample.astype(np.uint8))
 
-    checkpoint_callback = ModelCheckpoint(monitor="val_loss", mode='min')
+    # checkpoint_callback = ModelCheckpoint(monitor="val_loss", mode='min')
 
 
 
@@ -294,8 +183,8 @@ def main(hparams,gender_setting=None,fold_num=None,female_perc_in_training=None,
         # callbacks=[checkpoint_callback],
         callbacks=[EarlyStopping(monitor="val_loss", mode="min",patience=3)],
         log_every_n_steps = 1,
-        max_epochs=epochs,
-        gpus=hparams.gpus,
+        max_epochs=args.epochs,
+        gpus=args.gpus,
         accelerator="auto",
         logger=TensorBoardLogger(run_dir, name=run_config,version=cur_version),
     )
@@ -303,16 +192,16 @@ def main(hparams,gender_setting=None,fold_num=None,female_perc_in_training=None,
     trainer.fit(model, data)
 
     model = model_type.load_from_checkpoint(trainer.checkpoint_callback.best_model_path,
-                                            num_classes=num_classes,lr=lr,pretrained=pretrained,
-                                            model_scale=model_scale,
-                                            loss_func_type=loss_func_type
+                                            num_classes=args.num_classes,lr=args.lr,pretrained=args.pretrained,
+                                            model_scale=args.model_scale,
+                                            loss_func_type='BCE'
                                             )
 
     model.to(device)
 
-    cols_names_classes = ['class_' + str(i) for i in range(0,num_classes)]
-    cols_names_logits = ['logit_' + str(i) for i in range(0, num_classes)]
-    cols_names_targets = ['target_' + str(i) for i in range(0, num_classes)]
+    cols_names_classes = ['class_' + str(i) for i in range(0,args.num_classes)]
+    cols_names_logits = ['logit_' + str(i) for i in range(0, args.num_classes)]
+    cols_names_targets = ['target_' + str(i) for i in range(0, args.num_classes)]
 
     print('VALIDATION')
     preds_val, targets_val, logits_val = test_func(model, data.val_dataloader(), device)
@@ -331,15 +220,14 @@ def main(hparams,gender_setting=None,fold_num=None,female_perc_in_training=None,
     df.to_csv(os.path.join(out_dir, 'predictions.test.version_{}.csv'.format(cur_version)), index=False)
 
 
-    if (True and resam):
-        print('TESTING on train set')
-        # trainloader need to be non shuffled!
-        preds_test, targets_test, logits_test = test_func(model, data.train_dataloader_nonshuffle(), device)
-        df = pd.DataFrame(data=preds_test, columns=cols_names_classes)
-        df_logits = pd.DataFrame(data=logits_test, columns=cols_names_logits)
-        df_targets = pd.DataFrame(data=targets_test, columns=cols_names_targets)
-        df = pd.concat([df, df_logits, df_targets], axis=1)
-        df.to_csv(os.path.join(out_dir, 'predictions.train.version_{}.csv'.format(cur_version)), index=False)
+    print('TESTING on train set')
+    # trainloader need to be non shuffled!
+    preds_test, targets_test, logits_test = test_func(model, data.train_dataloader_nonshuffle(), device)
+    df = pd.DataFrame(data=preds_test, columns=cols_names_classes)
+    df_logits = pd.DataFrame(data=logits_test, columns=cols_names_logits)
+    df_targets = pd.DataFrame(data=targets_test, columns=cols_names_targets)
+    df = pd.concat([df, df_logits, df_targets], axis=1)
+    df.to_csv(os.path.join(out_dir, 'predictions.train.version_{}.csv'.format(cur_version)), index=False)
 
     # print('EMBEDDINGS')
     #
@@ -359,7 +247,7 @@ def main(hparams,gender_setting=None,fold_num=None,female_perc_in_training=None,
 
     # delete the model parameters
 
-    if save_model_para == False:
+    if args.save_model == False:
         model_para_dir = os.path.join(out_dir,'version_{}'.format(cur_version))
         shutil.rmtree(model_para_dir)
 
@@ -370,32 +258,52 @@ if __name__ == '__main__':
     parser.add_argument('--gpus', default=1)
     parser.add_argument('--dev', default=0)
 
-    parser.add_argument('-s','--dataset',default='NIH',help='Dataset, choose from [\'NIH\',\'chexpert\']')
-    parser.add_argument('-d','--disease_label',default='Pneumothorax', help='Chosen disease label')
-    parser.add_argument('-f', '--female_percent_in_training', default='50', help='Female percentage in training set, should be in the [0,50,100]')
+    # hps that need to chose when training
+    parser.add_argument('-s','--dataset',default='NIH',help='Dataset', choices =['NIH','chexpert'])
+    parser.add_argument('-d','--disease_label',default='Pneumothorax', help='Chosen disease label', type=list, nargs='+')
+    parser.add_argument('-f', '--female_percent_in_training', default=50, help='Female percentage in training set, should be in the [0,50,100]', type=list, nargs='+')
     parser.add_argument('-n', '--npp',default=1,help='Number per patient, could be integer or None (no sampling)')
-    parser.add_argument('-r', '--random_state', default=0, help='random state')
+    parser.add_argument('-r', '--random_state', default=(0,10), help='random state')
 
-    # -lr -epochs -model -model_scale -pretrained -aug -is_multilabel -image_size -crop
-    #     -prevalence_setting -save_model
-    parser.add_argument('-r', '--random_state', default=0, help='random state')
-
-
-
+    # hps that set as defaults
+    parser.add_argument('--lr', default=1e-6, help='learning rate, default=1e-6')
+    parser.add_argument('--bs', default=64, help='batch size, default=64')
+    parser.add_argument('--epochs',default=20,help='number of epochs, default=20')
+    parser.add_argument('--model', default='resnet', help='model, default=\'ResNet\'')
+    parser.add_argument('--model_scale', default=50, help='model scale, default=\'ResNet50\'')
+    parser.add_argument('--pretrained', default=True, help='pretrained or not, True or False, default=True')
+    parser.add_argument('--augmentation', default=True, help='augmentation during training or not, True or False, default=True')
+    parser.add_argument('--is_multilabel',default=False,help='training with multilabel or not, default=False, single label training')
+    parser.add_argument('--image_size', default=(224,224),help='image size')
+    parser.add_argument('--crop',default=None,help='crop the bottom part of the image, the percentage of cropped part, when cropping, default=0.6')
+    parser.add_argument('--prevalence_setting',default='separate',help='which kind of prevalence are being used when spliting, choose from [separate, equal, total]')
+    parser.add_argument('--save_model',default=False,help='dave model parameter or not')
+    parser.add_argument('--num_workers', default=2, help='number of workers')
 
     args = parser.parse_args()
+
+
+    # other hps
+
+    args.num_classes = len(DISEASE_LABELS_NIH) if args.dataset == 'NIH' else len(DISEASE_LABELS_CHE)
+
+
+    if args.image_size[0] == 224:
+        args.img_data_dir = '/work3/ninwe/dataset/{}/preproc_224x224/'.format(args.dataset)
+    elif args.image_size[0] == 1024:
+        args.img_data_dir = '/work3/ninwe/dataset/{}/images/'.format(args.dataset)
+
+    if args.dataset == 'NIH':
+        args.csv_file_img = '../datafiles/'+'Data_Entry_2017_v2020_clean_split.csv'
+    elif args.dataset == 'chexpert':
+        raise Exception('Not implemented.')
+
+
     print(args)
 
 
-
-    if resam:
-        print('***********RESAMPLING EXPERIMENT**********\n'*5)
-        for d in disease_list:
-            for female_perc_in_training in female_perc_in_training_set:
-                for i in random_state_set:
-                    main(args, female_perc_in_training=female_perc_in_training,random_state = i,chose_disease_str=d)
-    elif gi_split:
-        print('***********GI SPLIT EXPERIMENT**********\n' * 5)
-        for f_perc in female_perc_in_training_set:
-            for fold_i in fold_nums:
-                main(args, female_perc_in_training=f_perc, fold_num=fold_i)
+    print('***********RESAMPLING EXPERIMENT**********\n'*5)
+    for d in args.disease_label:
+        for female_perc_in_training in args.female_percent_in_training:
+            for i in np.range(args.random_state[0],args.random_state[1]):
+                main(args, female_perc_in_training=female_perc_in_training,random_state = i,chose_disease_str=d)

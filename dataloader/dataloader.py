@@ -20,6 +20,20 @@ DISEASE_LABELS_NIH = ['Effusion', 'Emphysema', 'Nodule', 'Atelectasis', 'Infiltr
                   'Pleural_Thickening', 'Pneumothorax',
                   'Consolidation', 'Fibrosis', 'Cardiomegaly', 'Pneumonia', 'Edema', 'Hernia']
 
+DISEASE_LABELS_CHE = [
+            'Enlarged Cardiomediastinum',
+            'Cardiomegaly',
+            'Lung Opacity',
+            'Lung Lesion',
+            'Edema',
+            'Consolidation',
+            'Pneumonia',
+            'Atelectasis',
+            'Pneumothorax',
+            'Pleural Effusion',
+            'Pleural Other',
+            'Fracture']
+
 class NIHDataset(Dataset):
     def __init__(self, img_data_dir, df_data, image_size, augmentation=False, pseudo_rgb = False,single_label=None,
                  crop=None, disease_labels_list=DISEASE_LABELS_NIH):
