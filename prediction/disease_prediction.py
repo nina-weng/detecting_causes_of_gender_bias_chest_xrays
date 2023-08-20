@@ -21,7 +21,7 @@ import numpy as np
 
 
 hp_default_value={'model':'resnet',
-                  'model_scale':50,
+                  'model_scale':'50',
                   'lr':1e-6,
                   'bs':64,
                   'epochs':20,
@@ -114,12 +114,13 @@ def main(args,female_perc_in_training=None,random_state=None,chose_disease_str=N
     run_config+= f'-fp{female_perc_in_training}-npp{args.npp}-rs{random_state}' #f_per, npp and rs
 
     # if the hp value is not default
+    args_dict = vars(args)
     for each_hp in hp_default_value.keys():
-        if hp_default_value[each_hp] != args[each_hp]:
-            run_config+= f'-{each_hp}{args.each_hp}'
+        if hp_default_value[each_hp] != args_dict[each_hp]:
+            run_config+= f'-{each_hp}{args_dict[each_hp]}'
 
     print('------------------------------------------\n'*3)
-    print(run_config)
+    print('run_config:{}'.format(run_config))
 
     # Create output directory
     # out_name = str(model.model_name)
@@ -149,11 +150,13 @@ def main(args,female_perc_in_training=None,random_state=None,chose_disease_str=N
                                 prevalence_setting = args.prevalence_setting,
 
             )
+    elif args.dataset == 'chexpert':
+        raise Exception('not implemented')
 
     # model
-    if args.model_choose == 'resnet':
+    if args.model == 'resnet':
         model_type = ResNet
-    elif args.model_choose == 'densenet':
+    elif args.model == 'densenet':
         model_type = DenseNet
     model = model_type(num_classes=args.num_classes,lr=args.lr,pretrained=args.pretrained,model_scale=args.model_scale,
                        loss_func_type = 'BCE')
@@ -204,7 +207,7 @@ def main(args,female_perc_in_training=None,random_state=None,chose_disease_str=N
     cols_names_targets = ['target_' + str(i) for i in range(0, args.num_classes)]
 
     print('VALIDATION')
-    preds_val, targets_val, logits_val = test_func(model, data.val_dataloader(), device)
+    preds_val, targets_val, logits_val = test_func(args,model, data.val_dataloader(), device)
     df = pd.DataFrame(data=preds_val, columns=cols_names_classes)
     df_logits = pd.DataFrame(data=logits_val, columns=cols_names_logits)
     df_targets = pd.DataFrame(data=targets_val, columns=cols_names_targets)
@@ -212,7 +215,7 @@ def main(args,female_perc_in_training=None,random_state=None,chose_disease_str=N
     df.to_csv(os.path.join(out_dir, 'predictions.val.version_{}.csv'.format(cur_version)), index=False)
 
     print('TESTING')
-    preds_test, targets_test, logits_test = test_func(model, data.test_dataloader(), device)
+    preds_test, targets_test, logits_test = test_func(args,model, data.test_dataloader(), device)
     df = pd.DataFrame(data=preds_test, columns=cols_names_classes)
     df_logits = pd.DataFrame(data=logits_test, columns=cols_names_logits)
     df_targets = pd.DataFrame(data=targets_test, columns=cols_names_targets)
@@ -222,7 +225,7 @@ def main(args,female_perc_in_training=None,random_state=None,chose_disease_str=N
 
     print('TESTING on train set')
     # trainloader need to be non shuffled!
-    preds_test, targets_test, logits_test = test_func(model, data.train_dataloader_nonshuffle(), device)
+    preds_test, targets_test, logits_test = test_func(args,model, data.train_dataloader_nonshuffle(), device)
     df = pd.DataFrame(data=preds_test, columns=cols_names_classes)
     df_logits = pd.DataFrame(data=logits_test, columns=cols_names_logits)
     df_targets = pd.DataFrame(data=targets_test, columns=cols_names_targets)
@@ -262,7 +265,7 @@ if __name__ == '__main__':
     parser.add_argument('-s','--dataset',default='NIH',help='Dataset', choices =['NIH','chexpert'])
     parser.add_argument('-d','--disease_label',default='Pneumothorax', help='Chosen disease label', type=list, nargs='+')
     parser.add_argument('-f', '--female_percent_in_training', default=50, help='Female percentage in training set, should be in the [0,50,100]', type=list, nargs='+')
-    parser.add_argument('-n', '--npp',default=1,help='Number per patient, could be integer or None (no sampling)')
+    parser.add_argument('-n', '--npp',default=1,help='Number per patient, could be integer or None (no sampling)',type=int)
     parser.add_argument('-r', '--random_state', default='0-10', help='random state')
 
     # hps that set as defaults
@@ -270,7 +273,7 @@ if __name__ == '__main__':
     parser.add_argument('--bs', default=64, help='batch size, default=64')
     parser.add_argument('--epochs',default=20,help='number of epochs, default=20')
     parser.add_argument('--model', default='resnet', help='model, default=\'ResNet\'')
-    parser.add_argument('--model_scale', default=50, help='model scale, default=\'ResNet50\'')
+    parser.add_argument('--model_scale', default='50', help='model scale, default=50',type=str)
     parser.add_argument('--pretrained', default=True, help='pretrained or not, True or False, default=True')
     parser.add_argument('--augmentation', default=True, help='augmentation during training or not, True or False, default=True')
     parser.add_argument('--is_multilabel',default=False,help='training with multilabel or not, default=False, single label training')
@@ -296,9 +299,11 @@ if __name__ == '__main__':
     if args.dataset == 'NIH':
         args.csv_file_img = '../datafiles/'+'Data_Entry_2017_v2020_clean_split.csv'
     elif args.dataset == 'chexpert':
+        args.csv_file_img = '../datafiles/'+'chexpert.sample.allrace.csv'
+    else:
         raise Exception('Not implemented.')
 
-
+    print('hyper-parameters:')
     print(args)
 
     if len(args.random_state.split('-')) != 2:
@@ -309,10 +314,9 @@ if __name__ == '__main__':
     rs_min, rs_max = int(args.random_state.split('-')[0]),int(args.random_state.split('-')[1])
 
     female_percent_in_training_set = [int(''.join(each)) for each in args.female_percent_in_training]
-    print(female_percent_in_training_set)
-
+    print('female_percent_in_training_set:{}'.format(female_percent_in_training_set))
     disease_label_list = [''.join(each) for each in args.disease_label]
-    print(disease_label_list)
+    print('disease_label_list:{}'.format(disease_label_list))
 
 
     print('***********RESAMPLING EXPERIMENT**********\n')
