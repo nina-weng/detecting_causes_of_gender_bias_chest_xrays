@@ -465,7 +465,8 @@ class NIHDataResampleModule(pl.LightningDataModule):
 
 
 class ChexpertDatasetNew(Dataset):
-    def __init__(self, img_data_dir, df_data, image_size, augmentation=False, pseudo_rgb = False,single_label=None):
+    def __init__(self, img_data_dir, df_data, image_size, augmentation=False, pseudo_rgb = False,single_label=None,
+         disease_labels_list=DISEASE_LABELS_CHE):
         self.img_data_dir = img_data_dir
         self.df_data = df_data
         self.image_size = image_size
@@ -473,7 +474,7 @@ class ChexpertDatasetNew(Dataset):
         self.pseudo_rgb = pseudo_rgb
         self.single_label = single_label
 
-        self.labels=DISEASE_LABELS_CHE
+        self.labels=disease_labels_list
         if self.single_label is not None:
             self.labels = [self.single_label]
 
@@ -550,8 +551,10 @@ class CheXpertDataResampleModule(pl.LightningDataModule):
                  num_per_patient=1,
                  prevalence_setting='separate'):
         super().__init__()
+        self.disease_labels_list = DISEASE_LABELS_CHE
         self.img_data_dir = img_data_dir
         self.csv_file_img = csv_file_img
+
 
         self.outdir = outdir
         self.version_no = version_no
@@ -613,11 +616,14 @@ class CheXpertDataResampleModule(pl.LightningDataModule):
 
 
         self.train_set = ChexpertDatasetNew(self.img_data_dir,self.df_train, self.image_size, augmentation=augmentation,
-                                    pseudo_rgb=pseudo_rgb,single_label=single_label)
+                                    pseudo_rgb=pseudo_rgb,single_label=single_label,
+                                    disease_labels_list=self.disease_labels_list)
         self.val_set = ChexpertDatasetNew(self.img_data_dir,self.df_valid, self.image_size, augmentation=False,
-                                  pseudo_rgb=pseudo_rgb,single_label=single_label)
+                                  pseudo_rgb=pseudo_rgb,single_label=single_label,
+                                  disease_labels_list=self.disease_labels_list)
         self.test_set = ChexpertDatasetNew(self.img_data_dir,self.df_test, self.image_size, augmentation=False,
-                                   pseudo_rgb=pseudo_rgb,single_label=single_label)
+                                   pseudo_rgb=pseudo_rgb,single_label=single_label,
+                                   disease_labels_list=self.disease_labels_list)
 
         print('#train: ', len(self.train_set))
         print('#val:   ', len(self.val_set))
@@ -638,7 +644,7 @@ class CheXpertDataResampleModule(pl.LightningDataModule):
 
     def dataset_sampling(self):
         df = pd.read_csv(self.csv_file_img, header=0)
-        for each_l in DISEASE_LABELS:
+        for each_l in self.disease_labels_list:
             df[each_l] = df[each_l].apply(lambda x: 1 if x == 1 else 0)
 
         patient_id_list = list(set(df[self.col_name_patient_id].to_list()))
@@ -788,27 +794,27 @@ class CheXpertDataResampleModule(pl.LightningDataModule):
 
     def get_prevalence(self):
         df = pd.read_csv(self.csv_file_img, header=0)
-        for each_l in DISEASE_LABELS:
+        for each_l in self.disease_labels_list:
             df[each_l] = df[each_l].apply(lambda x: 1 if x == 1 else 0)
         df_per_patient = df.groupby([self.col_name_patient_id , self.col_name_gender]).mean()
-        df_per_patient_p = df_per_patient.mean()[DISEASE_LABELS].to_list()
+        df_per_patient_p = df_per_patient.mean()[self.disease_labels_list].to_list()
 
-        df_per_patient_gender_p = df_per_patient.groupby([self.col_name_gender]).mean()[DISEASE_LABELS]
+        df_per_patient_gender_p = df_per_patient.groupby([self.col_name_gender]).mean()[self.disease_labels_list]
         df_per_patient_gender_p_male = df_per_patient_gender_p.loc[self.male].to_list()
         df_per_patient_gender_p_female = df_per_patient_gender_p.loc[self.female].to_list()
 
-        assert len(df_per_patient_gender_p_female) == len(DISEASE_LABELS)
-        assert len(df_per_patient_gender_p_male) == len(DISEASE_LABELS)
-        assert len(df_per_patient_p) == len(DISEASE_LABELS)
+        assert len(df_per_patient_gender_p_female) == len(self.disease_labels_list)
+        assert len(df_per_patient_gender_p_male) == len(self.disease_labels_list)
+        assert len(df_per_patient_p) == len(self.disease_labels_list)
 
         dict_per_patient_p = {}
-        for i,each_l in enumerate(DISEASE_LABELS): dict_per_patient_p[each_l] = df_per_patient_p[i]
+        for i,each_l in enumerate(self.disease_labels_list): dict_per_patient_p[each_l] = df_per_patient_p[i]
 
         dict_per_patient_gender_p_female = {}
-        for i, each_l in enumerate(DISEASE_LABELS): dict_per_patient_gender_p_female[each_l] = df_per_patient_gender_p_female[i]
+        for i, each_l in enumerate(self.disease_labels_list): dict_per_patient_gender_p_female[each_l] = df_per_patient_gender_p_female[i]
 
         dict_per_patient_gender_p_male = {}
-        for i, each_l in enumerate(DISEASE_LABELS): dict_per_patient_gender_p_male[each_l] = df_per_patient_gender_p_male[i]
+        for i, each_l in enumerate(self.disease_labels_list): dict_per_patient_gender_p_male[each_l] = df_per_patient_gender_p_male[i]
 
         print('Disease prevalence total: {}'.format(dict_per_patient_p))
         print('Disease prevalence Female: {}'.format(dict_per_patient_gender_p_female))
@@ -828,31 +834,31 @@ class CheXpertDataResampleModule(pl.LightningDataModule):
 
     def get_prevalence_patientwise(self):
         df = pd.read_csv(self.csv_file_img, header=0)
-        for each_l in DISEASE_LABELS:
+        for each_l in self.disease_labels_list:
             df[each_l] = df[each_l].apply(lambda x: 1 if x == 1 else 0)
 
         df_per_patient = df.groupby([self.col_name_patient_id, self.col_name_gender]).mean()
-        for each_labels in DISEASE_LABELS:
+        for each_labels in self.disease_labels_list:
             df_per_patient[each_labels] = df_per_patient[each_labels].apply(lambda x: 1 if x > 0 else 0)
 
-        df_per_patient_p = df_per_patient.mean()[DISEASE_LABELS].to_list()
+        df_per_patient_p = df_per_patient.mean()[self.disease_labels_list].to_list()
 
-        df_per_patient_gender_p = df_per_patient.groupby([self.col_name_gender]).mean()[DISEASE_LABELS]
+        df_per_patient_gender_p = df_per_patient.groupby([self.col_name_gender]).mean()[self.disease_labels_list]
         df_per_patient_gender_p_male = df_per_patient_gender_p.loc[self.male].to_list()
         df_per_patient_gender_p_female = df_per_patient_gender_p.loc[self.female].to_list()
 
-        assert len(df_per_patient_gender_p_female) == len(DISEASE_LABELS)
-        assert len(df_per_patient_gender_p_male) == len(DISEASE_LABELS)
-        assert len(df_per_patient_p) == len(DISEASE_LABELS)
+        assert len(df_per_patient_gender_p_female) == len(self.disease_labels_list)
+        assert len(df_per_patient_gender_p_male) == len(self.disease_labels_list)
+        assert len(df_per_patient_p) == len(self.disease_labels_list)
 
         dict_per_patient_p = {}
-        for i,each_l in enumerate(DISEASE_LABELS): dict_per_patient_p[each_l] = df_per_patient_p[i]
+        for i,each_l in enumerate(self.disease_labels_list): dict_per_patient_p[each_l] = df_per_patient_p[i]
 
         dict_per_patient_gender_p_female = {}
-        for i, each_l in enumerate(DISEASE_LABELS): dict_per_patient_gender_p_female[each_l] = df_per_patient_gender_p_female[i]
+        for i, each_l in enumerate(self.disease_labels_list): dict_per_patient_gender_p_female[each_l] = df_per_patient_gender_p_female[i]
 
         dict_per_patient_gender_p_male = {}
-        for i, each_l in enumerate(DISEASE_LABELS): dict_per_patient_gender_p_male[each_l] = df_per_patient_gender_p_male[i]
+        for i, each_l in enumerate(self.disease_labels_list): dict_per_patient_gender_p_male[each_l] = df_per_patient_gender_p_male[i]
 
         print('PATIENT WISE disease prevalence')
         print('Disease prevalence total: {}'.format(dict_per_patient_p))

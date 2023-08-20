@@ -22,6 +22,8 @@ Details about the hyper-parameters could be found in the same py file.
 
 ## Plotting the results
 
+need to create a new py for it
+
 ## Detecting the Causes
 ### 1. Representation Bias (Imbalance Dataset)
 

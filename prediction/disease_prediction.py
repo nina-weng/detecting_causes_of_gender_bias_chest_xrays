@@ -1,7 +1,7 @@
 import sys
 sys.path.append('../../detecting_causes_of_gender_bias_chest_xrays')
 
-from dataloader.dataloader import DISEASE_LABELS_NIH,NIHDataResampleModule, DISEASE_LABELS_CHE
+from dataloader.dataloader import DISEASE_LABELS_NIH,NIHDataResampleModule, DISEASE_LABELS_CHE,CheXpertDataResampleModule
 from prediction.models import ResNet,DenseNet
 
 
