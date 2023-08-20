@@ -370,10 +370,21 @@ if __name__ == '__main__':
     parser.add_argument('--gpus', default=1)
     parser.add_argument('--dev', default=0)
 
-    parser.add_argument('-ds','--dataset',default='NIH',help='Dataset, choose from [\'NIH\',\'chexpert\']')
-    parser.add_argument('-d','--disease_choose',default='Pneumothorax', help='chosen disease label')
+    parser.add_argument('-s','--dataset',default='NIH',help='Dataset, choose from [\'NIH\',\'chexpert\']')
+    parser.add_argument('-d','--disease_label',default='Pneumothorax', help='Chosen disease label')
+    parser.add_argument('-f', '--female_percent_in_training', default='50', help='Female percentage in training set, should be in the [0,50,100]')
+    parser.add_argument('-n', '--npp',default=1,help='Number per patient, could be integer or None (no sampling)')
+    parser.add_argument('-r', '--random_state', default=0, help='random state')
+
+    # -lr -epochs -model -model_scale -pretrained -aug -is_multilabel -image_size -crop
+    #     -prevalence_setting -save_model
+    parser.add_argument('-r', '--random_state', default=0, help='random state')
+
+
+
 
     args = parser.parse_args()
+    print(args)
 
 
 
