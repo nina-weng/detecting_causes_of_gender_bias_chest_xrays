@@ -263,7 +263,7 @@ if __name__ == '__main__':
     parser.add_argument('-d','--disease_label',default='Pneumothorax', help='Chosen disease label', type=list, nargs='+')
     parser.add_argument('-f', '--female_percent_in_training', default=50, help='Female percentage in training set, should be in the [0,50,100]', type=list, nargs='+')
     parser.add_argument('-n', '--npp',default=1,help='Number per patient, could be integer or None (no sampling)')
-    parser.add_argument('-r', '--random_state', default=(0,10), help='random state')
+    parser.add_argument('-r', '--random_state', default='0-10', help='random state')
 
     # hps that set as defaults
     parser.add_argument('--lr', default=1e-6, help='learning rate, default=1e-6')
@@ -301,9 +301,16 @@ if __name__ == '__main__':
 
     print(args)
 
+    if len(int(args.random_state.split('-'))) != 2:
+        if len(int(args.random_state.split('-'))) == 1:
+            rs_min, rs_max = int(args.random_state), int(args.random_state)+1
+        else:
+            raise Exception('Something wrong with args.random_states : {}'.format(args.random_states))
+    rs_min, rs_max = int(args.random_state.split('-')[0]),int(args.random_state.split('-')[1])
+
 
     print('***********RESAMPLING EXPERIMENT**********\n'*5)
     for d in args.disease_label:
         for female_perc_in_training in args.female_percent_in_training:
-            for i in np.range(args.random_state[0],args.random_state[1]):
+            for i in np.range(rs_min, rs_max):
                 main(args, female_perc_in_training=female_perc_in_training,random_state = i,chose_disease_str=d)
