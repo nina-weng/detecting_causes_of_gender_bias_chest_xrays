@@ -286,6 +286,7 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--female_percent_in_training', default=50, help='Female percentage in training set, should be in the [0,50,100]', type=list, nargs='+')
     parser.add_argument('-n', '--npp',default=1,help='Number per patient, could be integer or None (no sampling)',type=int)
     parser.add_argument('-r', '--random_state', default='0-10', help='random state')
+    parser.add_argument('-p','--img_dir',help='your img dir path here',type=str)
 
     # hps that set as defaults
     parser.add_argument('--lr', default=1e-6, help='learning rate, default=1e-6')
@@ -311,9 +312,9 @@ if __name__ == '__main__':
 
 
     if args.image_size[0] == 224:
-        args.img_data_dir = '/work3/ninwe/dataset/{}/preproc_224x224/'.format(args.dataset)
+        args.img_data_dir = args.img_dir+'{}/preproc_224x224/'.format(args.dataset)
     elif args.image_size[0] == 1024:
-        args.img_data_dir = '/work3/ninwe/dataset/{}/images/'.format(args.dataset)
+        args.img_data_dir = args.img_dir+'{}/images/'.format(args.dataset)
 
     if args.dataset == 'NIH':
         args.csv_file_img = '../datafiles/'+'Data_Entry_2017_v2020_clean_split.csv'

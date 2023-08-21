@@ -69,12 +69,12 @@ def get_gender_df(args,all_roc_auc_gi_nobs_df):
 
     return gender_df
 
-def load_demographic_data(args,preds,df):
-    if args.dataset == 'NIH':
+def load_demographic_data(preds,df,dataset):
+    if dataset == 'NIH':
         preds['sex'] = df['Patient Gender']
         preds['age'] = df['Patient Age']
         preds['patient_id'] = df['Patient ID']
-    elif args.dataset == 'chexpert':
+    elif dataset == 'chexpert':
         preds['race'] = df['race']
         preds['sex'] = df['sex']
         preds['age'] = df['age']

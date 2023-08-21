@@ -32,8 +32,8 @@ Mata data has already been processed, please refer to `chexpert.sample.allrace.c
 `Data_Entry_2017_v2020_clean_cplit.csv` (NIH).
 
 ### 2. images
-run the following command to pre-process the images (resize).
-`python3 ./preprocess/`
+run the following command to pre-process the images (resize).  
+`python3 ./preprocess/preproc_imgs.py -p {your dataset path}`
 
 ## Training
 Command example for training NIH dataset on label Pneumothorax with resampling strategy with random state from 0 to 10, 

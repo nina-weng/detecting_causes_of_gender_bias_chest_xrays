@@ -31,7 +31,7 @@ import seaborn as sns
 sns.set_theme(style='whitegrid')
 
 
-def plotting_all():
+def plotting_all(args):
     result_dir = 'D:\\ninavv\\phd\\research\\run_results\\'
     font_size=25
 
@@ -135,7 +135,7 @@ def plotting_all():
 
 
 
-def re_store_results(disease_label_list,list_rs,female_perc_in_training_sets):
+def re_store_results(args, dataset,disease_label_list,list_rs,female_perc_in_training_sets):
     for d in disease_label_list: #disease_labels:
         print('*'*30)
         print('D:{}'.format(d))
@@ -145,7 +145,7 @@ def re_store_results(disease_label_list,list_rs,female_perc_in_training_sets):
             print('F_PERC:{}'.format(f_per))
             pred_df_list=[]
             for rs in tqdm(list_rs):
-                run_config=f'{args.dataset}-{d}-fp{f_per}-npp{args.npp}-rs{rs}'
+                run_config=f'{dataset}-{d}-fp{f_per}-npp{args.npp}-rs{rs}'
                 version_no = 0
                 print(run_config)
 
@@ -155,7 +155,7 @@ def re_store_results(disease_label_list,list_rs,female_perc_in_training_sets):
                 df_test.reset_index(inplace = True)
                 assert df_test.shape[0] == pred_test.shape[0],'df_test:{},preds:{}'.format(df_test.shape,pred_test.shape)
 
-                pred_test = load_demographic_data(args,pred_test,df_test)
+                pred_test = load_demographic_data(pred_test,df_test,dataset)
                 pred_df_list.append(pred_test)
 
             # print(df_test.shape)
@@ -175,22 +175,13 @@ def re_store_results(disease_label_list,list_rs,female_perc_in_training_sets):
         gender_df_all = pd.concat([result_varioustrain[0],result_varioustrain[1],result_varioustrain[2]])
         # print(gender_df_all.shape)
         # print(gender_df_all)
-        gender_df_all.to_csv(args.out_dir+'{}-{}.csv'.format(args.dataset,d))
+        gender_df_all.to_csv(args.out_dir+'{}-{}.csv'.format(dataset,d))
 
 
 
 
-def main(args,disease_label_list,list_rs):
-    female_perc_in_training_sets = [0,50,100]
 
-    ##############
-    # re-store the prediction result in the form of auroc for different sensitive group in different gender ratios
-    re_store_results(args,disease_label_list,list_rs,female_perc_in_training_sets)
 
-    ################
-    # plotting
-    # a) plotting in a big picture
-    plotting
 
 
 
@@ -205,10 +196,12 @@ def main(args,disease_label_list,list_rs):
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('-s','--dataset',default='NIH',help='Dataset', choices =['NIH','chexpert'])
+    # the results from which datasets that we'd like to re-store to csv files
+    parser.add_argument('-s','--dataset',default='both',help='Dataset', choices =['NIH','chexpert','both'])
     parser.add_argument('-d','--disease_label',default='all', help='Chosen disease label', type=list, nargs='+')
     parser.add_argument('-n', '--npp',default=1,help='Number per patient, could be integer or None (no sampling)',type=int)
     parser.add_argument('-r', '--random_state', default='0-10', help='random state')
+    parser.add_argument('-p', '--run_dir', default='/work3/ninwe/run/', help='your run dir.', type=str)
     args = parser.parse_args()
     print('args:')
     print(args)
@@ -228,24 +221,38 @@ if __name__ == '__main__':
     if len(disease_label_list) ==1 and disease_label_list[0] == 'all':
         disease_label_list = DISEASE_LABELS_CHE if args.dataset == 'chexpert' else DISEASE_LABELS_NIH
 
-    if args.dataset == 'NIH':
-        args.male='M'
-        args.female='F'
-    elif args.dataset == 'chexpert':
-        args.male='Male'
-        args.female='Female'
-
-
     # define the path of run result files
-    data_dir = '/work3/ninwe/run/cause_bias/' # where to read the run results
-    out_dir = '/work3/ninwe/run/cause_bias/plotting/'
+    data_dir = args.run_dir + 'cause_bias/' # where to read the run results
+    out_dir = args.run_dir + 'cause_bias/plotting/'
     if os.path.exists(out_dir) == False:
         os.mkdir(out_dir)
 
     args.data_dir = data_dir
     args.out_dir = out_dir
 
-    #
-    main(args,disease_label_list,list_rs)
+    female_perc_in_training_sets = [0,50,100]
+
+
+    ##############
+    # re-store the prediction result in the form of auroc for different sensitive group in different gender ratios
+
+    if args.dataset == 'NIH' or args.dataset == 'both':
+        args.male='M'
+        args.female='F'
+        re_store_results(args,'NIH',disease_label_list,list_rs,female_perc_in_training_sets)
+
+
+    if args.dataset == 'chexpert' or args.dataset == 'both':
+        args.male='Male'
+        args.female='Female'
+        re_store_results(args,'chexpert',disease_label_list,list_rs,female_perc_in_training_sets)
+
+    ################
+    # plotting
+    # a) plotting in a big picture
+    plotting_all(args)
+
+
+
 
 

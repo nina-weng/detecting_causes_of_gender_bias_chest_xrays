@@ -5,32 +5,28 @@
     <option name="openedFilesInfos">
       <list>
         <OpenedFileInfo>
-          <option name="caretOffset" value="538" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/prediction/models.py" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="740" />
+          <option name="caretOffset" value="1277" />
           <option name="fileUrl" value="file://$PROJECT_DIR$/prediction/run.sh" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="11494" />
+          <option name="caretOffset" value="6430" />
           <option name="fileUrl" value="file://$PROJECT_DIR$/prediction/disease_prediction.py" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="2392" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/analysis/utils.py" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="1173" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/analysis/plotting.py" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="245" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/preprocess/preproc_imgs.py" />
         </OpenedFileInfo>
         <OpenedFileInfo>
           <option name="caretOffset" value="0" />
           <option name="fileUrl" value="file://$PROJECT_DIR$/README.md" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="1724" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/analysis/utils.py" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="820" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/preprocess/preprocimgs.py" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="5968" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/analysis/plotting.py" />
         </OpenedFileInfo>
       </list>
     </option>
