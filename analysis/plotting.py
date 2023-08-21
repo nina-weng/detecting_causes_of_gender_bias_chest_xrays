@@ -1,7 +1,6 @@
-
-
 #####
-# re-store the prediction results and plot Figure 2 in main paper and Figure 2 in suppplementary materials
+# re-store the prediction results and
+# plot Figure 2 in main paper and Figure 2 in suppplementary materials
 #####
 import os.path
 
@@ -14,17 +13,7 @@ import numpy as np
 
 import pandas as pd
 from tqdm import tqdm
-from collections import defaultdict
-from sklearn.metrics import roc_curve,roc_auc_score
-from sklearn.utils import resample
-from tabulate import tabulate
-from sklearn.metrics import roc_curve
-from sklearn.metrics import precision_recall_curve
-from sklearn.metrics import auc
-from sklearn.metrics import classification_report
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import balanced_accuracy_score
-from sklearn.metrics import recall_score
+import math
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -32,8 +21,18 @@ sns.set_theme(style='whitegrid')
 
 
 def plotting_all(args):
-    result_dir = 'D:\\ninavv\\phd\\research\\run_results\\'
+    result_dir = args.data_dir
     font_size=25
+
+    if args.dataset == 'both':
+        datasets = ['NIH','chexpert']
+        disease_list = list(set(DISEASE_LABELS_NIH)+set(DISEASE_LABELS_CHE))
+    else:
+        datasets = [args.dataset]
+        if args.dataset == 'NIH':
+            disease_list = DISEASE_LABELS_NIH
+        else: disease_list = DISEASE_LABELS_CHE
+
 
     per_plot_each_row = 6
     z = math.ceil(len(disease_list)/per_plot_each_row)
@@ -73,10 +72,7 @@ def plotting_all(args):
 
 
             try:
-                # normal settings (sample one with priority in diesease one)
-                csv_file = result_dir+'{}_results'.format(each_ds)+'\\plotting\\'+'updated_{}.csv'.format(each_d)
-                # sam prevalence between different groups
-                #csv_file = result_dir+'{}_results'.format(each_ds)+'\\plotting\\'+'equal_updated_{}.csv'.format(each_d)
+                csv_file = args.out_dir+'{}-{}.csv'.format(each_ds,each_d)
                 df = pd.read_csv(csv_file)
                 print(csv_file)
             except:
@@ -99,11 +95,13 @@ def plotting_all(args):
                         linewidth=1,
                         width=0.8,
                         ax=axes[j_new][i_new])
-            #         sns.stripplot(x="TrainOnFemalePerc", y='auroc', data=df,ax=axes[j_new][i_new],
-            #                      size=2,jitter=0.2,
-            #                       hue="TestOn",
-            #                      hue_order=['Test on Male','Test on Female',],
-            #                      palette=['yellowgreen','red'],dodge=True)
+
+            # scatter
+            # sns.stripplot(x="TrainOnFemalePerc", y='auroc', data=df,ax=axes[j_new][i_new],
+            #               size=2,jitter=0.2,
+            #               hue="TestOn",
+            #               hue_order=['Test on Male','Test on Female',],
+            #               palette=['yellowgreen','red'],dodge=True)
 
 
 
@@ -129,7 +127,7 @@ def plotting_all(args):
 
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.1, hspace=0.4)
     plt.tight_layout()
-    plt.savefig('D:\\ninavv\\phd\\research\\projects\\p1_bias_reasoning\\all_per_common_labels_updated_cheds.png')
+    plt.savefig(args.out_dir+'all_performance.png')
 
 
 
@@ -176,16 +174,6 @@ def re_store_results(args, dataset,disease_label_list,list_rs,female_perc_in_tra
         # print(gender_df_all.shape)
         # print(gender_df_all)
         gender_df_all.to_csv(args.out_dir+'{}-{}.csv'.format(dataset,d))
-
-
-
-
-
-
-
-
-
-
 
 
 

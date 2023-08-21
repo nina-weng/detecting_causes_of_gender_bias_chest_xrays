@@ -33,35 +33,49 @@ Mata data has already been processed, please refer to `chexpert.sample.allrace.c
 
 ### 2. images
 run the following command to pre-process the images (resize).  
-`python3 ./preprocess/preproc_imgs.py -p {your dataset path}`
+`python3 ./preprocess/preprocimgs.py -p {your dataset path}`
 
 ## Training
 Command example for training NIH dataset on label Pneumothorax with resampling strategy with random state from 0 to 10, 
 0, 50 and 100 female percentage in training:  
-`python3 ./prediction/disease_prediction.py -s NIH -d Pneumothorax -f 0 50 100 -n 1 -r 0-10`  
+`python3 ./prediction/disease_prediction.py -s NIH -d Pneumothorax -f 0 50 100 -n 1 -r 0-10 -p {your dataset folder path}`  
 
 Train on CheXpert:    
-`python3 ./prediction/disease_prediction.py -s chexpert -d Pneumothorax -f 0 50 100 -n 1 -r 0-10`  
+`python3 ./prediction/disease_prediction.py -s chexpert -d Pneumothorax -f 0 50 100 -n 1 -r 0-10 -p {your dataset folder path}`  
 
 Train on different disease labels sequently:   
-`python3 ./prediction/disease_prediction.py -s NIH -d Pneumothorax Pneumonia Cadiomegaly -f 0 50 100 -n 1 -r 0-10`
+`python3 ./prediction/disease_prediction.py -s NIH -d Pneumothorax Pneumonia Cadiomegaly -f 0 50 100 -n 1 -r 0-10 -p {your dataset folder path}`
 
 Details about the other hyper-parameters could be found in the same py file.
 
 ## Plotting the results
 
-need to create a new py for it
+For plotting all the disease after re-store the results into csv file:  
+`python3 ./analysis/plotting.py -p {your run result dir path}`
 
 ## Detecting the Causes
 ### 1. Representation Bias (Imbalance Dataset)
 
+See above `Plotting the results`.
+
 ### 2. Feature Bias (Breast shadows)
 
-{the experiment about cropping the image}
+To run the experiments with cropped images:  
+`python3 ./prediction/disease_prediction.py -s NIH -d Pneumothorax -f 0 50 100 -n 1 -r 0-10 --crop 0.6 -p {your dataset folder path}`
 
+Notice that this part of experiment does not apply to CheXpert.
 
 ### 3. Label Errors 
+#### 3.1 change the sampling strategies
+* Without prioritizing the diseased one: 
+* Without sampling or sample more than one scans per patient: change the `-n` hyper-parameter:  
+`python3 ./prediction/disease_prediction.py -s NIH -d Pneumothorax -f 0 50 100 -n None -r 0-10 -p {your dataset folder path}`
+* Change the prevalence setting: `--prevalence_setting total` or `--prevalence_setting equal`
 
-change the sampling strategies: run which py
-cross sampling strategies experiments: run which py
 
+#### 3.2 cross sampling strategies experiments: run which py
+
+1) Save model parameters:
+`python3 ./prediction/disease_prediction.py -s NIH -d Pneumothorax -f 0 50 100 -n None -r 0-10 -p {your dataset folder path} --save_model True`
+2) Run the cross dataset inference:
+`python3 ./analysis/cross_ds_inference.py -d Penumothorax --run_dir {your run dir} --data_dir {your dataset dir}`

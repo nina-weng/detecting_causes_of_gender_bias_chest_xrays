@@ -20,7 +20,7 @@ if __name__ == '__main__':
     if args.dataset == 'both' or args.dataset == 'NIH':
         print('start to pre-process NIH ...')
         img_data_dir = args.img_dir+'NIH/'
-        mata_csv_file = '../datafiles/Data_Entry_2017_v2020_clean_split.csv'
+        mata_csv_file = './datafiles/Data_Entry_2017_v2020_clean_split.csv'
 
         df = pd.read_csv(mata_csv_file,header=0)
 
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     if args.dataset == 'both' or args.dataset == 'chexpert':
         print('start to pre-process CheXpert ...')
 
-        df_file = '../datafiles/chexpert.sample.allrace.csv'
+        df_file = './datafiles/chexpert.sample.allrace.csv'
         df = pd.read_csv(df_file)
 
         img_data_dir = args.img_dir+'chexpert/'
