@@ -486,7 +486,7 @@ class ChexpertDatasetNew(Dataset):
         self.samples = []
         # for idx, _ in enumerate(tqdm(range(len(self.df_data)), desc='Loading Data')):
         for idx in tqdm((self.df_data.index), desc='Loading Data'):
-            path_preproc_idx = self.df_data.columns.get_loc("path_preproc")
+            path_preproc_idx = self.df_data.columns.get_loc("path_preproc_new")
             img_path = self.img_data_dir + self.df_data.iloc[idx, path_preproc_idx]
             img_label = np.zeros(len(self.labels), dtype='float32')
             for i in range(0, len(self.labels)):
