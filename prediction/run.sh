@@ -36,5 +36,5 @@ module load cuda/12.0
 source ../../../../chexpert_env/bin/activate
 
 #/appl/cuda/11.6.0/samples/bin/x86_64/linux/release/deviceQuery
-python3 ./disease_prediction.py -s chexpert -d Pneumothorax -f 0 50 100 -n 1 -r 0-10 -p '/work3/ninwe/dataset/'
+python3 ./disease_prediction.py -s NIH -d Pneumothorax -f 0 50 100 -n 1 -r 0-10 -p '/work3/ninwe/dataset/'
 

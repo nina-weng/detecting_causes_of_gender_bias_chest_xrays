@@ -1,0 +1,51 @@
+Loaded module: cuda/12.0
+Global seed set to 42
+../../detecting_causes_of_gender_bias_chest_xrays/dataloader/dataloader.py:796: DtypeWarning: Columns (24) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(self.csv_file_img, header=0)
+../../detecting_causes_of_gender_bias_chest_xrays/dataloader/dataloader.py:799: FutureWarning: The default value of numeric_only in DataFrameGroupBy.mean is deprecated. In a future version, numeric_only will default to False. Either specify numeric_only or select only columns which should be valid for the function.
+  df_per_patient = df.groupby([self.col_name_patient_id , self.col_name_gender]).mean()
+../../detecting_causes_of_gender_bias_chest_xrays/dataloader/dataloader.py:836: DtypeWarning: Columns (24) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(self.csv_file_img, header=0)
+../../detecting_causes_of_gender_bias_chest_xrays/dataloader/dataloader.py:840: FutureWarning: The default value of numeric_only in DataFrameGroupBy.mean is deprecated. In a future version, numeric_only will default to False. Either specify numeric_only or select only columns which should be valid for the function.
+  df_per_patient = df.groupby([self.col_name_patient_id, self.col_name_gender]).mean()
+../../detecting_causes_of_gender_bias_chest_xrays/dataloader/dataloader.py:646: DtypeWarning: Columns (24) have mixed types. Specify dtype option on import or set low_memory=False.
+  df = pd.read_csv(self.csv_file_img, header=0)
+Loading Data:   0%|          | 0/17100 [00:00<?, ?it/s]Loading Data:  17%|█▋        | 2887/17100 [00:00<00:00, 28861.63it/s]Loading Data:  35%|███▌      | 6019/17100 [00:00<00:00, 30304.69it/s]Loading Data:  53%|█████▎    | 9139/17100 [00:00<00:00, 30712.07it/s]Loading Data:  72%|███████▏  | 12237/17100 [00:00<00:00, 30816.51it/s]Loading Data:  90%|████████▉ | 15337/17100 [00:00<00:00, 30879.05it/s]Loading Data: 100%|██████████| 17100/17100 [00:00<00:00, 30702.42it/s]
+Loading Data:   0%|          | 0/2850 [00:00<?, ?it/s]Loading Data: 100%|██████████| 2850/2850 [00:00<00:00, 30487.07it/s]
+Loading Data:   0%|          | 0/17098 [00:00<?, ?it/s]Loading Data:  18%|█▊        | 3055/17098 [00:00<00:00, 30541.15it/s]Loading Data:  36%|███▌      | 6110/17098 [00:00<00:00, 30518.08it/s]Loading Data:  54%|█████▍    | 9197/17098 [00:00<00:00, 30674.73it/s]Loading Data:  72%|███████▏  | 12280/17098 [00:00<00:00, 30734.33it/s]Loading Data:  90%|████████▉ | 15354/17098 [00:00<00:00, 30676.22it/s]Loading Data: 100%|██████████| 17098/17098 [00:00<00:00, 30676.84it/s]
+/zhome/0f/f/154252/chexpert_env/lib/python3.8/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/zhome/0f/f/154252/chexpert_env/lib/python3.8/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=ResNet50_Weights.IMAGENET1K_V1`. You can also use `weights=ResNet50_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+Lossy conversion from float32 to uint8. Range [0, 1]. Convert image to uint8 prior to saving to suppress this warning.
+Lossy conversion from float32 to uint8. Range [0, 1]. Convert image to uint8 prior to saving to suppress this warning.
+Lossy conversion from float32 to uint8. Range [0, 1]. Convert image to uint8 prior to saving to suppress this warning.
+Lossy conversion from float32 to uint8. Range [0, 1]. Convert image to uint8 prior to saving to suppress this warning.
+Lossy conversion from float32 to uint8. Range [0, 1]. Convert image to uint8 prior to saving to suppress this warning.
+/zhome/0f/f/154252/chexpert_env/lib/python3.8/site-packages/pytorch_lightning/trainer/connectors/accelerator_connector.py:474: LightningDeprecationWarning: Setting `Trainer(gpus=1)` is deprecated in v1.7 and will be removed in v2.0. Please use `Trainer(accelerator='gpu', devices=1)` instead.
+  rank_zero_deprecation(
+GPU available: True (cuda), used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+
+  | Name       | Type           | Params
+----------------------------------------------
+0 | model      | ResNet         | 23.5 M
+1 | loss_func  | BCELoss        | 0     
+2 | accu_func  | BinaryAccuracy | 0     
+3 | auroc_func | BinaryAUROC    | 0     
+----------------------------------------------
+23.5 M    Trainable params
+0         Non-trainable params
+23.5 M    Total params
+94.040    Total estimated model params size (MB)
+/zhome/0f/f/154252/chexpert_env/lib/python3.8/site-packages/pytorch_lightning/trainer/connectors/data_connector.py:224: PossibleUserWarning: The dataloader, val_dataloader 0, does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` (try 24 which is the number of cpus on this machine) in the `DataLoader` init to improve performance.
+  rank_zero_warn(
+/zhome/0f/f/154252/chexpert_env/lib/python3.8/site-packages/torchmetrics/utilities/prints.py:36: UserWarning: No negative samples in targets, false positive value should be meaningless. Returning zero tensor in false positive score
+  warnings.warn(*args, **kwargs)
+/zhome/0f/f/154252/chexpert_env/lib/python3.8/site-packages/pytorch_lightning/trainer/connectors/data_connector.py:224: PossibleUserWarning: The dataloader, train_dataloader, does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` (try 24 which is the number of cpus on this machine) in the `DataLoader` init to improve performance.
+  rank_zero_warn(
+/zhome/0f/f/154252/chexpert_env/lib/python3.8/site-packages/torchmetrics/utilities/prints.py:36: UserWarning: No positive samples in targets, true positive value should be meaningless. Returning zero tensor in true positive score
+  warnings.warn(*args, **kwargs)

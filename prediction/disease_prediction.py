@@ -32,7 +32,8 @@ hp_default_value={'model':'resnet',
                   'crop':None,
                   'prevalence_setting':'separate',
                   'save_model':False,
-                  'num_workers':2
+                  'num_workers':2,
+                  'num_classes':1
 
 }
 
@@ -294,26 +295,28 @@ if __name__ == '__main__':
     parser.add_argument('--epochs',default=20,help='number of epochs, default=20')
     parser.add_argument('--model', default='resnet', help='model, default=\'ResNet\'')
     parser.add_argument('--model_scale', default='50', help='model scale, default=50',type=str)
-    parser.add_argument('--pretrained', default=True, help='pretrained or not, True or False, default=True')
-    parser.add_argument('--augmentation', default=True, help='augmentation during training or not, True or False, default=True')
-    parser.add_argument('--is_multilabel',default=False,help='training with multilabel or not, default=False, single label training')
-    parser.add_argument('--image_size', default=(224,224),help='image size')
+    parser.add_argument('--pretrained', default=True, help='pretrained or not, True or False, default=True',type=lambda x: (str(x).lower() == 'true'))
+    parser.add_argument('--augmentation', default=True, help='augmentation during training or not, True or False, default=True',type=lambda x: (str(x).lower() == 'true'))
+    parser.add_argument('--is_multilabel',default=False,help='training with multilabel or not, default=False, single label training',type=lambda x: (str(x).lower() == 'true'))
+    parser.add_argument('--image_size', default=224,help='image size',type=int)
     parser.add_argument('--crop',default=None,help='crop the bottom part of the image, the percentage of cropped part, when cropping, default=0.6')
-    parser.add_argument('--prevalence_setting',default='separate',help='which kind of prevalence are being used when spliting, choose from [separate, equal, total]')
-    parser.add_argument('--save_model',default=False,help='dave model parameter or not')
+    parser.add_argument('--prevalence_setting',default='separate',help='which kind of prevalence are being used when spliting,\
+                        choose from [separate, equal, total]',choices=['separate','equal','total'])
+    parser.add_argument('--save_model',default=False,help='dave model parameter or not',type=lambda x: (str(x).lower() == 'true'))
     parser.add_argument('--num_workers', default=2, help='number of workers')
 
     args = parser.parse_args()
 
 
     # other hps
+    if args.is_multilabel:
+        args.num_classes = len(DISEASE_LABELS_NIH) if args.dataset == 'NIH' else len(DISEASE_LABELS_CHE)
+    else: args.num_classes = 1
 
-    args.num_classes = len(DISEASE_LABELS_NIH) if args.dataset == 'NIH' else len(DISEASE_LABELS_CHE)
 
-
-    if args.image_size[0] == 224:
+    if args.image_size == 224:
         args.img_data_dir = args.img_dir+'{}/preproc_224x224/'.format(args.dataset)
-    elif args.image_size[0] == 1024:
+    elif args.image_size == 1024:
         args.img_data_dir = args.img_dir+'{}/images/'.format(args.dataset)
 
     if args.dataset == 'NIH':
@@ -336,6 +339,8 @@ if __name__ == '__main__':
     female_percent_in_training_set = [int(''.join(each)) for each in args.female_percent_in_training]
     print('female_percent_in_training_set:{}'.format(female_percent_in_training_set))
     disease_label_list = [''.join(each) for each in args.disease_label]
+    if len(disease_label_list) ==1 and disease_label_list[0] == 'all':
+        disease_label_list = DISEASE_LABELS_NIH if args.dataset == 'NIH' else DISEASE_LABELS_CHE
     print('disease_label_list:{}'.format(disease_label_list))
 
 
