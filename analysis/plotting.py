@@ -2,6 +2,8 @@
 # re-store the prediction results and
 # plot Figure 2 in main paper and Figure 2 in suppplementary materials
 #####
+import sys
+sys.path.append('../detecting_causes_of_gender_bias_chest_xrays')
 import os.path
 
 from dataloader.dataloader import DISEASE_LABELS_NIH, DISEASE_LABELS_CHE
@@ -26,7 +28,7 @@ def plotting_all(args):
 
     if args.dataset == 'both':
         datasets = ['NIH','chexpert']
-        disease_list = list(set(DISEASE_LABELS_NIH)+set(DISEASE_LABELS_CHE))
+        disease_list = list(set(DISEASE_LABELS_NIH).union(set(DISEASE_LABELS_CHE)))
     else:
         datasets = [args.dataset]
         if args.dataset == 'NIH':
@@ -36,7 +38,7 @@ def plotting_all(args):
 
     per_plot_each_row = 6
     z = math.ceil(len(disease_list)/per_plot_each_row)
-    print(per_plot_each_row,z)
+    # print(per_plot_each_row,z)
     nrows = int(len(datasets)*z)
     ncols = per_plot_each_row
 
@@ -44,7 +46,7 @@ def plotting_all(args):
     fig,axes = plt.subplots(nrows=nrows,ncols=ncols,figsize=(ncols*4,nrows*4),
                             dpi=100)
 
-    print(axes.shape)
+    # print(axes.shape)
 
     for i,each_d in enumerate(disease_list):
         for j,each_ds in enumerate(datasets):
@@ -52,7 +54,7 @@ def plotting_all(args):
             j_new = int(i//per_plot_each_row)*2+j
 
 
-            print(j_new,i_new,each_d,each_ds)
+            # print(j_new,i_new,each_d,each_ds)
             if j_new==7:
                 axes[j_new][i_new].set_xlabel('%female in training',fontsize=10)
             else:
@@ -74,7 +76,7 @@ def plotting_all(args):
             try:
                 csv_file = args.out_dir+'{}-{}.csv'.format(each_ds,each_d)
                 df = pd.read_csv(csv_file)
-                print(csv_file)
+                # print(csv_file)
             except:
                 continue
 
@@ -87,7 +89,7 @@ def plotting_all(args):
             if 'Test on M' in x
             else 'Test on Female')
             df = df[df['rs']<10]
-            print(df.shape)
+            # print(df.shape)
             sns.boxplot(x="TrainOnFemalePerc", y="auroc", hue="TestOn",
                         hue_order=['Test on Male','Test on Female',],
                         palette=['blue','gold'],
@@ -145,11 +147,16 @@ def re_store_results(args, dataset,disease_label_list,list_rs,female_perc_in_tra
             for rs in tqdm(list_rs):
                 run_config=f'{dataset}-{d}-fp{f_per}-npp{args.npp}-rs{rs}'
                 version_no = 0
-                print(run_config)
 
-                pred_test = pd.read_csv(data_dir + run_config+'\\predictions.test.version_{}.csv'.format(version_no))
-                # load demographic data according to dataset
-                df_test = pd.read_csv(data_dir + run_config+'\\test.version_{}.csv'.format(version_no))
+
+                try:
+                    pred_test = pd.read_csv(data_dir + run_config+'/predictions.test.version_{}.csv'.format(version_no))
+                    # load demographic data according to dataset
+                    df_test = pd.read_csv(data_dir + run_config+'/test.version_{}.csv'.format(version_no))
+                except:
+                    continue
+
+                print(run_config)
                 df_test.reset_index(inplace = True)
                 assert df_test.shape[0] == pred_test.shape[0],'df_test:{},preds:{}'.format(df_test.shape,pred_test.shape)
 
@@ -157,8 +164,8 @@ def re_store_results(args, dataset,disease_label_list,list_rs,female_perc_in_tra
                 pred_df_list.append(pred_test)
 
             # print(df_test.shape)
-            all_roc_auc_nobs_df = no_bs(pred_df_list,d)
-            gender_df = get_gender_df(all_roc_auc_nobs_df)
+            all_roc_auc_nobs_df = no_bs(args,pred_df_list,d)
+            gender_df = get_gender_df(args,all_roc_auc_nobs_df)
 
             gender_df_this_f_perc = gender_df.copy()
             if f_per == 100:
@@ -169,6 +176,12 @@ def re_store_results(args, dataset,disease_label_list,list_rs,female_perc_in_tra
                 trainon = 'Train on Both'
             gender_df_this_f_perc['exp_suffix'] = gender_df_this_f_perc['exp_suffix'].apply(lambda x: trainon+' '+x )
             result_varioustrain.append(gender_df_this_f_perc)
+
+        if result_varioustrain == []:
+            # skip this disease label
+            continue
+
+        print('re-storing {}- {}'.format(dataset,d))
 
         gender_df_all = pd.concat([result_varioustrain[0],result_varioustrain[1],result_varioustrain[2]])
         # print(gender_df_all.shape)
@@ -227,17 +240,22 @@ if __name__ == '__main__':
     if args.dataset == 'NIH' or args.dataset == 'both':
         args.male='M'
         args.female='F'
+        print('re-storing NIH run results ... ')
         re_store_results(args,'NIH',disease_label_list,list_rs,female_perc_in_training_sets)
+        print('re-storing NIH run results finished. ')
 
 
     if args.dataset == 'chexpert' or args.dataset == 'both':
         args.male='Male'
         args.female='Female'
+        print('re-storing chexpert run results ... ')
         re_store_results(args,'chexpert',disease_label_list,list_rs,female_perc_in_training_sets)
+        print('re-storing chexpert run results finished. ')
 
     ################
     # plotting
     # a) plotting in a big picture
+    print('start plotting...')
     plotting_all(args)
 
 

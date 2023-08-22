@@ -2,15 +2,6 @@
 
 Code repository for 2023 MICCAI workshop FAIMI paper: [Are Sex-based Physiological Differences the Cause of Gender Bias for Chest X-ray Diagnosis?](https://arxiv.org/abs/2308.05129)
 
-'''
-tmp for integrating: (delete later)
-functions: 
-1. being able to access both datasets
-2. only the resampling dataloader
-3. run command: python train.py -ds dataset -d disease_label -fp female_percent_in_training -npp number_per_patient -rs random_states
-    and some other defaulted ones (could be set during training): -lr -epochs -model -model_scale -pretrained -aug -is_multilabel -image_size -crop
-    -prevalence_setting -save_model
-'''
 
 ## Datasets
 
@@ -48,6 +39,9 @@ Train on different disease labels sequently:
 
 Details about the other hyper-parameters could be found in the same py file.
 
+*Sampling actually takes quite a time:*
+#TODO: prepare the splits for different random states as csv in `./datafiles/`
+
 ## Plotting the results
 
 For plotting all the disease after re-store the results into csv file:  
@@ -67,7 +61,7 @@ Notice that this part of experiment does not apply to CheXpert.
 
 ### 3. Label Errors 
 #### 3.1 change the sampling strategies
-* Without prioritizing the diseased one: 
+* Without prioritizing the diseased one: #TODO
 * Without sampling or sample more than one scans per patient: change the `-n` hyper-parameter:  
 `python3 ./prediction/disease_prediction.py -s NIH -d Pneumothorax -f 0 50 100 -n None -r 0-10 -p {your dataset folder path}`
 * Change the prevalence setting: `--prevalence_setting total` or `--prevalence_setting equal`

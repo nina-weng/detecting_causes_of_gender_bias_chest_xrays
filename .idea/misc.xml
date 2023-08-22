@@ -9,16 +9,12 @@
           <option name="fileUrl" value="file://$PROJECT_DIR$/prediction/run.sh" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="6088" />
+          <option name="caretOffset" value="248" />
           <option name="fileUrl" value="file://$PROJECT_DIR$/prediction/disease_prediction.py" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="1724" />
+          <option name="caretOffset" value="141" />
           <option name="fileUrl" value="file://$PROJECT_DIR$/analysis/utils.py" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="7091" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/analysis/plotting.py" />
         </OpenedFileInfo>
         <OpenedFileInfo>
           <option name="caretOffset" value="3805" />
@@ -31,6 +27,10 @@
         <OpenedFileInfo>
           <option name="caretOffset" value="1610" />
           <option name="fileUrl" value="file://$PROJECT_DIR$/prediction/models.py" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="2671" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/analysis/plotting.py" />
         </OpenedFileInfo>
         <OpenedFileInfo>
           <option name="caretOffset" value="0" />
