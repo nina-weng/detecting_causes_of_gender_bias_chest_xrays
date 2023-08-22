@@ -47,7 +47,11 @@ Details about the other hyper-parameters could be found in the same py file.
 For plotting all the disease after re-store the results into csv file:  
 `python3 ./analysis/plotting.py -p {your run result dir path}`
 
+
 ![](./imgs4readme/all_per.png)
+
+(*Well, you need to edit the image a bit to make it like this;)*)
+
 
 ## Detecting the Causes
 ### 1. Representation Bias (Imbalance Dataset)
