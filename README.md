@@ -3,6 +3,18 @@
 Code repository for 2023 MICCAI workshop FAIMI paper: [Are Sex-based Physiological Differences the Cause of Gender Bias for Chest X-ray Diagnosis?](https://arxiv.org/abs/2308.05129)
 
 
+## Enviroment Set-up
+
+The code repo should be functioning well under `python==3.9.11`.
+
+Create a new conda enviroment:  
+`conda create -n detecting_causes python=3.9.11 `
+
+Install the packages in requirements.txt:  
+`conda install -f requirements.txt`
+
+
+
 ## Datasets
 
 Both datasets are available online.  
