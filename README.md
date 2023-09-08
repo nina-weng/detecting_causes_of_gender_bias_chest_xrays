@@ -72,6 +72,9 @@ when set `--image_size 1024` during training.
 
 (*Well, you need to edit the image a bit to make it like this;)*)
 
+#TODO
+When specify dataset as ['NIH','chexpert'], the plotting has index errors. Fix it!!
+
 
 ## Detecting the Causes
 ### 1. Representation Bias (Imbalance Dataset)
