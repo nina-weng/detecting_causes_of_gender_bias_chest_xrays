@@ -55,7 +55,7 @@ def plotting_all(args):
 
 
             # print(j_new,i_new,each_d,each_ds)
-            if j_new==7:
+            if j_new==7:#nrows
                 axes[j_new][i_new].set_xlabel('%female in training',fontsize=10)
             else:
                 axes[j_new][i_new].set_xlabel(None)
@@ -130,6 +130,7 @@ def plotting_all(args):
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.1, hspace=0.4)
     plt.tight_layout()
     plt.savefig(args.out_dir+'all_performance.png')
+    print(f'plot saved at: {args.out_dir}all_performance.png')
 
 
 
@@ -164,6 +165,8 @@ def re_store_results(args, dataset,disease_label_list,list_rs,female_perc_in_tra
                 pred_df_list.append(pred_test)
 
             # print(df_test.shape)
+            if pred_df_list == []:
+                continue
             all_roc_auc_nobs_df = no_bs(args,pred_df_list,d)
             gender_df = get_gender_df(args,all_roc_auc_nobs_df)
 
@@ -180,13 +183,14 @@ def re_store_results(args, dataset,disease_label_list,list_rs,female_perc_in_tra
         if result_varioustrain == []:
             # skip this disease label
             continue
-
+        print(result_varioustrain)
         print('re-storing {}- {}'.format(dataset,d))
 
         gender_df_all = pd.concat([result_varioustrain[0],result_varioustrain[1],result_varioustrain[2]])
         # print(gender_df_all.shape)
         # print(gender_df_all)
         gender_df_all.to_csv(args.out_dir+'{}-{}.csv'.format(dataset,d))
+        print(f'restore the csv file at: {args.out_dir}{dataset}-{d}.csv')
 
 
 
@@ -199,7 +203,7 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     # the results from which datasets that we'd like to re-store to csv files
     parser.add_argument('-s','--dataset',default='both',help='Dataset', choices =['NIH','chexpert','both'])
-    parser.add_argument('-d','--disease_label',default='all', help='Chosen disease label', type=list, nargs='+')
+    parser.add_argument('-d','--disease_label',default=['all'], help='Chosen disease label', type=str, nargs='*')
     parser.add_argument('-n', '--npp',default=1,help='Number per patient, could be integer or None (no sampling)',type=int)
     parser.add_argument('-r', '--random_state', default='0-10', help='random state')
     parser.add_argument('-p', '--run_dir', default='/work3/ninwe/run/', help='your run dir.', type=str)
@@ -217,10 +221,11 @@ if __name__ == '__main__':
     list_rs = np.arange(rs_min,rs_max)
 
     # interpret disease labels
-    disease_label_list = [''.join(each) for each in args.disease_label]
+    disease_label_list = args.disease_label #[''.join(each) for each in args.disease_label]
 
     if len(disease_label_list) ==1 and disease_label_list[0] == 'all':
         disease_label_list = DISEASE_LABELS_CHE if args.dataset == 'chexpert' else DISEASE_LABELS_NIH
+    print('Disease labels: {}'.format(disease_label_list))
 
     # define the path of run result files
     data_dir = args.run_dir + 'cause_bias/' # where to read the run results

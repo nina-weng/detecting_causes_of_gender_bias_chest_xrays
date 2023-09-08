@@ -283,7 +283,7 @@ if __name__ == '__main__':
 
     # hps that need to chose when training
     parser.add_argument('-s','--dataset',default='NIH',help='Dataset', choices =['NIH','chexpert'])
-    parser.add_argument('-d','--disease_label',default='Pneumothorax', help='Chosen disease label', type=list, nargs='+')
+    parser.add_argument('-d','--disease_label',default=['Pneumothorax'], help='Chosen disease label', type=str, nargs='*')
     parser.add_argument('-f', '--female_percent_in_training', default=50, help='Female percentage in training set, should be in the [0,50,100]', type=list, nargs='+')
     parser.add_argument('-n', '--npp',default=1,help='Number per patient, could be integer or None (no sampling)',type=int)
     parser.add_argument('-r', '--random_state', default='0-10', help='random state')
@@ -338,7 +338,7 @@ if __name__ == '__main__':
 
     female_percent_in_training_set = [int(''.join(each)) for each in args.female_percent_in_training]
     print('female_percent_in_training_set:{}'.format(female_percent_in_training_set))
-    disease_label_list = [''.join(each) for each in args.disease_label]
+    disease_label_list = args.disease_label #[''.join(each) for each in args.disease_label]
     if len(disease_label_list) ==1 and disease_label_list[0] == 'all':
         disease_label_list = DISEASE_LABELS_NIH if args.dataset == 'NIH' else DISEASE_LABELS_CHE
     print('disease_label_list:{}'.format(disease_label_list))

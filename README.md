@@ -41,13 +41,17 @@ run the following command to pre-process the images (resize).
 ## Training
 Command example for training NIH dataset on label Pneumothorax with resampling strategy with random state from 0 to 10, 
 0, 50 and 100 female percentage in training:  
-`python3 ./prediction/disease_prediction.py -s NIH -d Pneumothorax -f 0 50 100 -n 1 -r 0-10 -p {your dataset folder path}`  
+
+First, go to the `predction` folder:  
+`cd ./prediction/`  
+
+`python3 ./disease_prediction.py -s NIH -d Pneumothorax -f 0 50 100 -n 1 -r 0-10 -p {your dataset folder path}`  
 
 Train on CheXpert:    
-`python3 ./prediction/disease_prediction.py -s chexpert -d Pneumothorax -f 0 50 100 -n 1 -r 0-10 -p {your dataset folder path}`  
+`python3 ./disease_prediction.py -s chexpert -d Pneumothorax -f 0 50 100 -n 1 -r 0-10 -p {your dataset folder path}`  
 
 Train on different disease labels sequently:   
-`python3 ./prediction/disease_prediction.py -s NIH -d Pneumothorax Pneumonia Cadiomegaly -f 0 50 100 -n 1 -r 0-10 -p {your dataset folder path}`
+`python3 ./disease_prediction.py -s NIH -d Pneumothorax Pneumonia Cadiomegaly -f 0 50 100 -n 1 -r 0-10 -p {your dataset folder path}`
 
 Details about the other hyper-parameters could be found in the same py file.
 
@@ -91,3 +95,5 @@ Notice that this part of experiment does not apply to CheXpert.
 `python3 ./prediction/disease_prediction.py -s NIH -d Pneumothorax -f 0 50 100 -n None -r 0-10 -p {your dataset folder path} --save_model True`
 2) Run the cross dataset inference:
 `python3 ./analysis/cross_ds_inference.py -d Penumothorax --run_dir {your run dir} --data_dir {your dataset dir}`
+
+
