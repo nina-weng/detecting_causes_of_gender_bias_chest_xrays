@@ -13,6 +13,8 @@ Create a new conda enviroment:
 Install the packages in requirements.txt:  
 `conda install -f requirements.txt`
 
+Or: (prob work better)  
+`conda env create -f env.yml`
 
 
 ## Datasets
