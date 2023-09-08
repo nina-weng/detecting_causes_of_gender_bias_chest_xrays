@@ -55,7 +55,7 @@ def plotting_all(args):
 
 
             # print(j_new,i_new,each_d,each_ds)
-            if j_new==7:#nrows
+            if j_new==7:#nrows-1
                 axes[j_new][i_new].set_xlabel('%female in training',fontsize=10)
             else:
                 axes[j_new][i_new].set_xlabel(None)
@@ -146,7 +146,7 @@ def re_store_results(args, dataset,disease_label_list,list_rs,female_perc_in_tra
             print('F_PERC:{}'.format(f_per))
             pred_df_list=[]
             for rs in tqdm(list_rs):
-                run_config=f'{dataset}-{d}-fp{f_per}-npp{args.npp}-rs{rs}'
+                run_config=f'{dataset}-{d}-fp{f_per}-npp{args.npp}-rs{rs}{args.suffix}' # add suffix
                 version_no = 0
 
 
@@ -207,6 +207,7 @@ if __name__ == '__main__':
     parser.add_argument('-n', '--npp',default=1,help='Number per patient, could be integer or None (no sampling)',type=int)
     parser.add_argument('-r', '--random_state', default='0-10', help='random state')
     parser.add_argument('-p', '--run_dir', default='/work3/ninwe/run/', help='your run dir.', type=str)
+    parser.add_argument('-f', '--suffix',default='',help='any other hyper-parameters used when trainning, need to be manually set up for now',type=str)
     args = parser.parse_args()
     print('args:')
     print(args)

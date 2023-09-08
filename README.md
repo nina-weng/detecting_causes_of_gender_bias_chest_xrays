@@ -63,6 +63,10 @@ Details about the other hyper-parameters could be found in the same py file.
 For plotting all the disease after re-store the results into csv file:  
 `python3 ./analysis/plotting.py -p {your run result dir path}`
 
+If you train the model with changed hyper-parameters rather then the required 5 (`-s -d -f -n -r`), you need to add another hyperparameter mannually as `-f`. 
+For example:   
+`python3 ./analysis/plotting.py -p {your run result dir path} -f -image_size1024`  
+when set `--image_size 1024` during training.
 
 ![](./imgs4readme/all_per.png)
 
